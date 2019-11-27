@@ -47,7 +47,7 @@ camera = Camera(path.m_beginPos,camAxisSize);
 
 
 % Car properties ----------------------------------------------------------
-numCars = 5;
+numCars = 1;
 arr = ones(1,numCars);
 pos_x = (5+path.m_beginPos(1)).*arr;
 pos_y = path.m_endPos(2).*arr;

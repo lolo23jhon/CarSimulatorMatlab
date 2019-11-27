@@ -51,9 +51,6 @@ classdef Car < handle
         % Distance bewteen the rear and front axle (m)
         m_axleDist;
         
-        % Model size (coefficient)
-        m_size;
-        
         % Polygon shape triangle
         m_model;
         
@@ -98,6 +95,9 @@ classdef Car < handle
         % Used to get momentum threshold after which effective steering angle decreases (m/s)
         s_slipThreshold = 30;
         
+        % Length relationship of the axle distande to the width or vehicle
+        s_widthMult=0.45;
+        
     end
     
     methods
@@ -114,7 +114,6 @@ classdef Car < handle
             this.m_rr = 30 * t_cof;
             this.m_frontalArea = t_frontalArea;
             this.m_axleDist = t_axleDistance;
-            this.m_size = t_axleDistance;
             this.m_speedLimit = t_speedLimit;
             this.m_color = t_color;
             
@@ -136,8 +135,19 @@ classdef Car < handle
             
             % x = cx + r * cos(a)
             % y = cy + r * sin(a)
-            model_x = [this.m_p(1)+0.6*this.m_size*cosd(this.m_facingAngle),this.m_p(1)+0.4*this.m_size*cosd(this.m_facingAngle+120),this.m_p(1)+0.4*this.m_size*cosd(this.m_facingAngle+240)];
-            model_y = [this.m_p(2)+0.6*this.m_size*sind(this.m_facingAngle),this.m_p(2)+0.4*this.m_size*sind(this.m_facingAngle+120),this.m_p(2)+0.4*this.m_size*sind(this.m_facingAngle+240)];
+            fangle = this.m_facingAngle;
+            axDist = this.m_axleDist;
+            wMult = this.s_widthMult;
+            diagDist = sqrt(axDist^2+(wMult*axDist)^2);
+            angleFromHoriz = atand(wMult);
+            ang = [fangle + angleFromHoriz, fangle + 180-angleFromHoriz,fangle + 180 + angleFromHoriz, fangle + 360 - angleFromHoriz];
+            for i = 1:numel(ang)
+                while ang(i) > 360
+                    ang(i) = ang(i) - 360;
+                end
+            end
+            model_x = [this.m_p(1)+diagDist*cosd(ang(1)),this.m_p(1)+diagDist*cosd(ang(2)),this.m_p(1)+diagDist*cosd(ang(3)),this.m_p(1)+ diagDist*cosd(ang(4))];
+            model_y = [this.m_p(2)+diagDist*sind(ang(1)),this.m_p(2)+diagDist*sind(ang(2)),this.m_p(2)+diagDist*sind(ang(3)),this.m_p(2)+ diagDist*sind(ang(4))];
             this.m_model = polyshape(model_x, model_y);
             
         end
@@ -306,8 +316,22 @@ classdef Car < handle
             this.m_p = this.m_p + deltaPos;
             
             % Update model position
-            model_x = [this.m_p(1)+0.6*this.m_size*cosd(this.m_facingAngle),this.m_p(1)+0.4*this.m_size*cosd(this.m_facingAngle+120),this.m_p(1)+0.4*this.m_size*cosd(this.m_facingAngle+240)];
-            model_y = [this.m_p(2)+0.6*this.m_size*sind(this.m_facingAngle),this.m_p(2)+0.4*this.m_size*sind(this.m_facingAngle+120),this.m_p(2)+0.4*this.m_size*sind(this.m_facingAngle+240)];
+            
+            % x = cx + r * cos(a)
+            % y = cy + r * sin(a)
+            fangle = this.m_facingAngle;
+            axDist = this.m_axleDist;
+            wMult = this.s_widthMult;
+            diagDist = sqrt(axDist^2+(wMult*axDist)^2);
+            angleFromHoriz = atand(wMult);
+            ang = [fangle + angleFromHoriz, fangle + 180-angleFromHoriz,fangle + 180 + angleFromHoriz, fangle + 360 - angleFromHoriz];
+            for i = 1:numel(ang)
+                while ang(i) > 360
+                    ang(i) = ang(i) - 360;
+                end
+            end
+            model_x = [this.m_p(1)+diagDist*cosd(ang(1)),this.m_p(1)+diagDist*cosd(ang(2)),this.m_p(1)+diagDist*cosd(ang(3)),this.m_p(1)+ diagDist*cosd(ang(4))];
+            model_y = [this.m_p(2)+diagDist*sind(ang(1)),this.m_p(2)+diagDist*sind(ang(2)),this.m_p(2)+diagDist*sind(ang(3)),this.m_p(2)+ diagDist*sind(ang(4))];
             this.m_model = polyshape(model_x, model_y);
             
         end %  updateCar(this,t_dt)
@@ -323,17 +347,17 @@ classdef Car < handle
             end
             if t_steering
                 ang = this.m_facingAngle + this.m_steeringAngle;
-                line = angleToVector(ang,this.m_size);
+                line = angleToVector(ang,this.m_axleDist);
                 plot([this.m_p(1), this.m_p(1)+line(1) ],[this.m_p(2),this.m_p(2)+line(2)],this.s_steeringDirectionColor);
             end
             if t_vel && this.m_v(1) ~= 0 && this.m_v(2) ~= 0
                 ang = get2dVectorAngle(this.m_v);
-                line = angleToVector(ang,this.m_size);
+                line = angleToVector(ang,this.m_axleDist);
                 plot([this.m_p(1), this.m_p(1)+line(1) ],[this.m_p(2),this.m_p(2)+line(2)],this.s_velColor);
             end
             if t_accel && this.m_a(1) ~= 0 && this.m_a(2) ~= 0
                 ang = get2dVectorAngle(this.m_a);
-                line = angleToVector(ang,this.m_size);
+                line = angleToVector(ang,this.m_axleDist);
                 plot([this.m_p(1), this.m_p(1)+line(1) ],[this.m_p(2),this.m_p(2)+line(2)],this.s_accelColor);
             end
             
