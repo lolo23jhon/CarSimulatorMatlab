@@ -254,7 +254,7 @@ classdef Car < handle
             
             distanceTravelled = vectorMagnitude(deltaPos);
             
-            % If the car is steering and its not slipping
+            % If the car is steering 
             if this.m_steeringAngle ~= 0
                 
                 % If speed is above a cerain threshold, decrase the

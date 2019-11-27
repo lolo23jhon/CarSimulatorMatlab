@@ -56,9 +56,9 @@ for i = 2:numCars
     pos_y(i) = pos_y(i-1) + spacer;
 end
 axleDist = 5;
-ai = ["cautious","cautious","cautious","cautious","speeder"];
+ai = ["cautious","cautious","turtle","turtle","speeder"];
 ang = 290.*arr; %(deg)
-mass = [660,660,660,660,660]; %(kg)
+mass = [660,660,660,660,700]; %(kg)
 cof = 0.35.*arr; %(coefficient of friction)
 frontalArea = 2.2.*arr; %(m^2)
 axle = axleDist.*arr; %(m)
