@@ -5,7 +5,7 @@ on motion laws and conservation of energy.
 
 ## Getting Started
 
-Put all the files into the same folder.
+Put all the files into the same folder and call main on the Matlab command console.
 
 ### Prerequisites
 
@@ -197,8 +197,6 @@ The cars have a member by composition of type CarAi which determines the basic b
 ## Authors
 
 * **Pedro Escoboza** - psebastian01@hotmail.com
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
 
 
