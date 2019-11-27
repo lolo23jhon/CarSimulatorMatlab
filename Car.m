@@ -138,22 +138,20 @@ classdef Car < handle
             fangle = this.m_facingAngle;
             axDist = this.m_axleDist;
             wMult = this.s_widthMult;
-            diagDist = sqrt(axDist^2+(wMult*axDist)^2);
-            angleFromHoriz = atand(wMult);
-            ang = [fangle + angleFromHoriz, fangle + 180-angleFromHoriz,fangle + 180 + angleFromHoriz, fangle + 360 - angleFromHoriz];
+            diagDist = sqrt(axDist^2+(0.5*wMult*axDist)^2);
+            angleFromHoriz = atand(0.5*wMult);
+            ang = [fangle + angleFromHoriz, fangle+90,fangle + 270, fangle - angleFromHoriz];
             for i = 1:numel(ang)
                 while ang(i) > 360
                     ang(i) = ang(i) - 360;
                 end
             end
-            model_x = [this.m_p(1)+diagDist*cosd(ang(1)),this.m_p(1)+diagDist*cosd(ang(2)),this.m_p(1)+diagDist*cosd(ang(3)),this.m_p(1)+ diagDist*cosd(ang(4))];
-            model_y = [this.m_p(2)+diagDist*sind(ang(1)),this.m_p(2)+diagDist*sind(ang(2)),this.m_p(2)+diagDist*sind(ang(3)),this.m_p(2)+ diagDist*sind(ang(4))];
+            model_x = [this.m_p(1)+diagDist*cosd(ang(1)),this.m_p(1)+0.5*axDist*wMult*cosd(ang(2)),this.m_p(1)+0.5*axDist*wMult*cosd(ang(3)),this.m_p(1)+ diagDist*cosd(ang(4))];
+            model_y = [this.m_p(2)+diagDist*sind(ang(1)),this.m_p(2)+0.5*axDist*wMult*sind(ang(2)),this.m_p(2)+0.5*axDist*wMult*sind(ang(3)),this.m_p(2)+ diagDist*sind(ang(4))];
             this.m_model = polyshape(model_x, model_y);
             
+            
         end
-        
-        
-        
         % Input of wheel rotation applied instantly
         function setSteeringAngle(this, t_angle)
             
@@ -322,16 +320,16 @@ classdef Car < handle
             fangle = this.m_facingAngle;
             axDist = this.m_axleDist;
             wMult = this.s_widthMult;
-            diagDist = sqrt(axDist^2+(wMult*axDist)^2);
-            angleFromHoriz = atand(wMult);
-            ang = [fangle + angleFromHoriz, fangle + 180-angleFromHoriz,fangle + 180 + angleFromHoriz, fangle + 360 - angleFromHoriz];
+            diagDist = sqrt(axDist^2+(0.5*wMult*axDist)^2);
+            angleFromHoriz = atand(0.5*wMult);
+            ang = [fangle + angleFromHoriz, fangle+90,fangle + 270, fangle - angleFromHoriz];
             for i = 1:numel(ang)
                 while ang(i) > 360
                     ang(i) = ang(i) - 360;
                 end
             end
-            model_x = [this.m_p(1)+diagDist*cosd(ang(1)),this.m_p(1)+diagDist*cosd(ang(2)),this.m_p(1)+diagDist*cosd(ang(3)),this.m_p(1)+ diagDist*cosd(ang(4))];
-            model_y = [this.m_p(2)+diagDist*sind(ang(1)),this.m_p(2)+diagDist*sind(ang(2)),this.m_p(2)+diagDist*sind(ang(3)),this.m_p(2)+ diagDist*sind(ang(4))];
+            model_x = [this.m_p(1)+diagDist*cosd(ang(1)),this.m_p(1)+0.5*axDist*wMult*cosd(ang(2)),this.m_p(1)+0.5*axDist*wMult*cosd(ang(3)),this.m_p(1)+ diagDist*cosd(ang(4))];
+            model_y = [this.m_p(2)+diagDist*sind(ang(1)),this.m_p(2)+0.5*axDist*wMult*sind(ang(2)),this.m_p(2)+0.5*axDist*wMult*sind(ang(3)),this.m_p(2)+ diagDist*sind(ang(4))];
             this.m_model = polyshape(model_x, model_y);
             
         end %  updateCar(this,t_dt)
