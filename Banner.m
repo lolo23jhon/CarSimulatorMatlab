@@ -10,7 +10,7 @@ classdef Banner
       m_str;
       
       % Distance from reference position
-      m_distFromPos;
+      m_disp_xy;
       
    end
    properties (Constant)
@@ -21,24 +21,24 @@ classdef Banner
    end
    methods
        % Class constructor
-       function this = Banner(t_pos,t_str)
+       function this = Banner(t_pos,t_str,t_disp_xy)
            this.m_pos = t_pos;
            this.m_str = t_str;
+           this.m_disp_xy = t_disp_xy;
        end
        
        % Update the banner on screen
-       function updateBanner(this,t_pos,t_xyTrans, t_vars)
+       function updateBanner(this,t_pos,t_disp_xy, t_vars)
           this.m_pos = t_pos;
-          this.m_distFromPos = t_xyTrans;
-          textPos = t_pos + this.m_distFromPos;
+          this.m_disp_xy = t_disp_xy;
+          textPos = t_pos + this.m_disp_xy;
           msg = sprintf(this.m_str,t_vars(:));          
           text(textPos(1),textPos(2),msg );
           line_x = [t_pos(1),textPos(1)];
           line_y = [t_pos(2), textPos(2)];
           plot(line_x,line_y,"Color", this.s_lineColor);
-           
        end
-       
+             
        
    end
     

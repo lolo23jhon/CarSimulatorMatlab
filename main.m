@@ -5,6 +5,7 @@ clear;
 clc;
 
 % Information display properties ------------------------------------------
+SHOW_BANNERS = true;
 PRINT_TO_CONSOLE = false;
 USE_KM = false;
 DRAW_CENTER_OF_ROTATION = false;
@@ -46,14 +47,14 @@ stands = [Box(st_a_x,st_a_y,SIZE_MULTIPLIER,'k'),Box(st_b_x,st_b_y,SIZE_MULTIPLI
 
 % Camera properties -------------------------------------------------------
 CAM_AXIS_SIZE = 100;
-IS_UPDATE_CAMERA = true;
+CAMERA_FOLLOW_FIRST = true;
 
 cameraStaticAxis = [path.m_beginPos(1)-50,path.m_endPos(1)+50,1550,3300];
-camera = Camera(path.m_beginPos,camAxisSize);
+camera = Camera(path.m_beginPos,CAM_AXIS_SIZE);
 
 
 % Car properties ----------------------------------------------------------
-NUM_CARS = 1;
+NUM_CARS = 5;
 AXLE_DISTANCE = 5;
 ALL_SAME_MASS = true;
 MASS = 700; % (kg)
@@ -71,26 +72,36 @@ end
 ai = ["cautious","cautious","turtle","turtle","speeder"];
 ang = 290.*arr; %(deg)
 mass = [660,660,660,660,700]; %(kg)
+if ALL_SAME_MASS
+    mass = MASS.*arr;
+end 
 cof = 0.35.*arr; %(coefficient of friction)
 frontalArea = 2.2.*arr; %(m^2)
 axle = AXLE_DISTANCE.*arr; %(m)
 speedLimit = 0; %(m/s)
 color = ['r','g','b','y','k'];
 
-% Banner properties -------------------------------------------------------
-SHOW_BANNEERS
-
-% Initialize cars
+% Car initialization
 for i = 1:NUM_CARS
-    car(i) = Car(true,CarAi(path,ai(i)),[pos_x(i),pos_y(i)],ang(i),mass(i),cof(i),frontalArea(i),axle(i),speedLimit,color(i));
+    cars(i) = Car(true,CarAi(path,ai(i)),[pos_x(i),pos_y(i)],ang(i),mass(i),cof(i),frontalArea(i),axle(i),speedLimit,color(i));
 end
+
+
+% Banner properties -------------------------------------------------------
+BANNER_DISP = [10,10]; 
+if SHOW_BANNERS
+    for i = 1:NUM_CARS
+       banners(i) = Banner(cars(i).m_p,"POS: (%.1f, %.1f) m\nVEL: %.2f m/s;",BANNER_DISP); 
+    end
+end
+
 
 % Draw the road
 drawPath(path);
 
 % Draw the cars in place
 for n =1: NUM_CARS
-    drawCar(car(n),DRAW_CENTER_OF_ROTATION,DRAW_STEERING_DIRECTION,DRAW_VELOCITY_DIRECTION, DRAW_VELOCITY_DIRECTION);
+    drawCar(cars(n),DRAW_CENTER_OF_ROTATION,DRAW_STEERING_DIRECTION,DRAW_VELOCITY_DIRECTION, DRAW_VELOCITY_DIRECTION);
 end
 
 % Draw the stands
@@ -108,10 +119,10 @@ for i = 1:NUM_TICKS
     for n = 1:NUM_CARS
         
         % Update each car instance
-        updateCar(car(n),dt);
+        updateCar(cars(n),dt);
         
         % Change car inputs
-        drive(car(n).m_ai,car(n));
+        drive(cars(n).m_ai,cars(n));
         
     end
     
@@ -120,24 +131,32 @@ for i = 1:NUM_TICKS
     for n = 1:NUM_CARS
         
         % Display the cars' graphics
-        drawCar(car(n),DRAW_CENTER_OF_ROTATION,DRAW_STEERING_DIRECTION,DRAW_VELOCITY_DIRECTION, DRAW_VELOCITY_DIRECTION);
+        drawCar(cars(n),DRAW_CENTER_OF_ROTATION,DRAW_STEERING_DIRECTION,DRAW_VELOCITY_DIRECTION, DRAW_VELOCITY_DIRECTION);
         
         
     end
     
     % Update the camera position to follow the rightmost car
-    if isUpdateCamera
-        updateCamera(camera,car)
+    if CAMERA_FOLLOW_FIRST
+        updateCamera(camera,cars)
     else
         axis(cameraStaticAxis);
     end
+    
+    % Update the banners
+    if SHOW_BANNERS
+       for i = 1:NUM_CARS
+           updateBanner(banners(i),cars(i).m_p,BANNER_DISP,[cars(i).m_p,vectorMagnitude(cars(i).m_v)]);
+       end
+    end
+    
     drawnow;
         
-    
-    if isPrintToConsole
-        % Print car information to console
-        printCars(car,i*dt,useKm);
+    % Print car information to console
+    if PRINT_TO_CONSOLE
+        printCars(cars,i*dt,useKm);
     end
+    
 end
 
 fprintf("\n===== End of simulation =====\n\n Number of ticks: %d\n",NUM_TICKS);
