@@ -45,6 +45,11 @@ st_b_y = [18.294650411299987,18.294650411299703,18.394650411299942,18.3946504112
 stands = [Box(st_a_x,st_a_y,SIZE_MULTIPLIER,'k'),Box(st_b_x,st_b_y,SIZE_MULTIPLIER,'k')];
 
 
+for i = 1:numel(stands)
+    AABB{i} = stands(i).m_poly.Vertices;
+end
+   
+
 % Camera properties -------------------------------------------------------
 CAM_AXIS_SIZE = 100;
 CAMERA_FOLLOW_FIRST = true;
@@ -54,7 +59,7 @@ camera = Camera(path.m_beginPos,CAM_AXIS_SIZE);
 
 
 % Car properties ----------------------------------------------------------
-NUM_CARS = 5;
+NUM_CARS = 1;
 AXLE_DISTANCE = 5;
 ALL_SAME_MASS = true;
 MASS = 700; % (kg)
@@ -69,12 +74,12 @@ for i = 2:NUM_CARS
 end
 
 
-ai = ["cautious","cautious","turtle","turtle","speeder"];
+ai = ["no-brakes","cautious","turtle","turtle","speeder"];
 ang = 290.*arr; %(deg)
 mass = [660,660,660,660,700]; %(kg)
 if ALL_SAME_MASS
     mass = MASS.*arr;
-end 
+end
 cof = 0.35.*arr; %(coefficient of friction)
 frontalArea = 2.2.*arr; %(m^2)
 axle = AXLE_DISTANCE.*arr; %(m)
@@ -88,10 +93,14 @@ end
 
 
 % Banner properties -------------------------------------------------------
-BANNER_DISP = [10,10]; 
+BANNER_DISP = [15,15];
+if ~CAMERA_FOLLOW_FIRST
+    BANNER_DISP = 10.*BANNER_DISP;
+end
+BANNER_SPACER = BANNER_DISP./NUM_CARS;
 if SHOW_BANNERS
     for i = 1:NUM_CARS
-       banners(i) = Banner(cars(i).m_p,"POS: (%.1f, %.1f) m\nVEL: %.2f m/s;",BANNER_DISP); 
+        banners(i) = Banner(cars(i).m_p,"P:(%.1f,\t%.1f) m | V: %.2f m/s;",BANNER_DISP);
     end
 end
 
@@ -119,7 +128,7 @@ for i = 1:NUM_TICKS
     for n = 1:NUM_CARS
         
         % Update each car instance
-        updateCar(cars(n),dt);
+        updateCar(cars(n),dt,AABB);
         
         % Change car inputs
         drive(cars(n).m_ai,cars(n));
@@ -145,13 +154,17 @@ for i = 1:NUM_TICKS
     
     % Update the banners
     if SHOW_BANNERS
-       for i = 1:NUM_CARS
-           updateBanner(banners(i),cars(i).m_p,BANNER_DISP,[cars(i).m_p,vectorMagnitude(cars(i).m_v)]);
-       end
+        for i = 1:NUM_CARS
+            disp = BANNER_DISP + (i*BANNER_SPACER).*[1,1];
+            %if ~mod(i,2)
+             %   disp = -disp;
+            %end
+            updateBanner(banners(i),cars(i).m_p,disp,[cars(i).m_p,vectorMagnitude(cars(i).m_v)]);
+        end
     end
     
     drawnow;
-        
+    
     % Print car information to console
     if PRINT_TO_CONSOLE
         printCars(cars,i*dt,useKm);

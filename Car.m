@@ -98,6 +98,9 @@ classdef Car < handle
         % Length relationship of the axle distande to the width or vehicle
         s_widthMult=0.45;
         
+        
+        s_drawAABB = true;
+        
     end
     
     methods
@@ -202,10 +205,103 @@ classdef Car < handle
             this.m_speedLimit = t_limit;
         end
         
+        % This function receives a cell matrix with aabb vertices to decide
+        % if a collision occured
+        function r_isCollision = checkCollision(this, t_aabb_bodies)
+            
+            car_verts = this.m_model.Vertices;
+            
+            car_min_x = inf;
+            car_max_x = -inf;
+            
+            car_min_y = inf;
+            car_max_y = -inf;
+            
+            
+            % Get the aabb for the car
+            for i = 1:4
+                
+                car_x = car_verts(i,1);
+                car_y = car_verts(i,2);
+                
+                
+                if car_x < car_min_x
+                    car_min_x = car_verts(i,1);
+                end
+                if car_x > car_max_x
+                    car_max_x = car_x;
+                end
+                
+                
+                
+                if car_y < car_min_y
+                    car_min_y = car_y;
+                end
+                if car_y > car_max_y
+                    car_max_y = car_y;
+                end
+                
+            end % for i = 1:4
+            
+            if this.s_drawAABB
+                pgon_x = [car_min_x, car_max_x, car_max_x, car_min_x];
+                pgon_y = [car_min_y, car_min_y, car_max_y, car_max_y];
+                aabb = polygon(pgon_x,pgon_y);
+                plot(aabb,'g');
+            end
+            
+            
+            % Interpenetration comparison
+            for i = numel(t_aabb_bodies)
+                
+                box = t_aabb_body{i};
+                
+                box_min_x = inf;
+                box_max_x = -inf;
+                
+                box_min_y = inf;
+                box_max_y = -inf;
+                
+                % Find min and max for x and y box vertices
+                for j = 1:4
+                    box_x = box(j,1);
+                    box_y = box(j,2);
+                    
+                    if box_x < box_min_x
+                        box_min_x = box_x;
+                    end
+                    if box_x > box_max_x
+                        box_max_x = box_x;
+                    end
+                    
+                    
+                    if box_y < box_min_y
+                        box_min_y = box_y;
+                    end
+                    if box_y > box_max_y
+                        box_max_y = box_y;
+                    end
+                    
+                end % for j = 1:4
+                
+                
+                
+                
+                % AABB collision detection
+                if car_max_x >= box_min_x && car_min_x <= box_max_x && car_max_y >= box_min_y && car_min_y <= box_max_y
+                    r_isCollision = true;
+                    return;
+                end
+                
+            end % for i = numel(t_aabb_bodies)
+            
+            r_isCollision = false;
+            
+        end % checkCollision()
         
         
         % Update all the properties of the car, runs each tick
-        function updateCar(this,t_dt)
+        function updateCar(this,t_dt,t_aabb)
             % Get the linear speed used in force calculations
             velMag = vectorMagnitude(this.m_v);
             
@@ -254,7 +350,7 @@ classdef Car < handle
             
             distanceTravelled = vectorMagnitude(deltaPos);
             
-            % If the car is steering 
+            % If the car is steering
             if this.m_steeringAngle ~= 0
                 
                 % If speed is above a cerain threshold, decrase the
@@ -331,6 +427,15 @@ classdef Car < handle
             model_x = [this.m_p(1)+diagDist*cosd(ang(1)),this.m_p(1)+0.5*axDist*wMult*cosd(ang(2)),this.m_p(1)+0.5*axDist*wMult*cosd(ang(3)),this.m_p(1)+ diagDist*cosd(ang(4))];
             model_y = [this.m_p(2)+diagDist*sind(ang(1)),this.m_p(2)+0.5*axDist*wMult*sind(ang(2)),this.m_p(2)+0.5*axDist*wMult*sind(ang(3)),this.m_p(2)+ diagDist*sind(ang(4))];
             this.m_model = polyshape(model_x, model_y);
+            
+            
+            
+            
+            
+            
+            % Check for collisions
+            isCol = checkCollision(this,t_aabb);
+            
             
         end %  updateCar(this,t_dt)
         

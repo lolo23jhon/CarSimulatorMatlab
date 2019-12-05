@@ -23,7 +23,7 @@ classdef CarAi < handle
         
         s_wpCol = [0.2,0.8,0.8];
         
-        s_styles = ["speeder","cautious","turtle"];
+        s_styles = ["speeder","cautious","no-brakes","turtle"];
         
         s_outOfTrackBrake = 3.5;
     end
@@ -120,6 +120,11 @@ classdef CarAi < handle
             end
         end
         
+        % Driving style: speeder that cant break
+        function noBrakes(~,t_owner)
+            setThrottle(t_owner,1);
+        end
+        
         % Driving style: the slower the better
         function turtle(this,t_owner)
             
@@ -160,6 +165,8 @@ classdef CarAi < handle
                     speeder(this,t_owner);
                 case "cautious"
                     cautious(this,t_owner);
+                case "no-brakes"
+                    noBrakes(this,t_owner);
                 case "turtle"
                     turtle(this,t_owner);
             end
