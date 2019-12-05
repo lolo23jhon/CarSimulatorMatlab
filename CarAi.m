@@ -23,13 +23,13 @@ classdef CarAi < handle
         
         s_wpCol = [0.2,0.8,0.8];
         
-        s_styles = ["speeder","cautious","no-brakes","turtle","crasher"];
+        s_styles = ["speeder","cautious","no-brakes","turtle","crasher","broken"];
         
         s_outOfTrackBrake = 3.5;
         
         s_crashPoint = [812.12882679, 1839.4650411299942];
         
-        s_distFromCrashPoint = 230;
+        s_distFromCrashPoint = 180;
     end
     methods
         
@@ -162,6 +162,13 @@ classdef CarAi < handle
             
         end
         
+        % Driving style: does nothing at all
+        function broken(~,t_owner)
+           setBrake(t_owner,1);
+           setThrottle(t_owner,0);
+           t_owner.m_isStop = true;
+        end
+        
         % Change the car ai on the run
         function setDrivingStyle(this,t_style_str)
             isIn = false;
@@ -204,6 +211,8 @@ classdef CarAi < handle
                     turtle(this,t_owner);
                 case "crasher"
                     crasher(this,t_owner);
+                case "broken"
+                    broken(this,t_owner);
             end
             
             goTo(this,t_owner,this.m_currCkpnt);

@@ -72,6 +72,9 @@ classdef Car < handle
         % Stop driving?
         m_isStop = false;
         
+        % Whether to draw the AABB for the car on the display
+        m_drawAABB;
+        
     end
     properties (Constant)
         % Force output by the car's engine (N)
@@ -102,14 +105,14 @@ classdef Car < handle
         s_widthMult=0.45;
         
         
-        s_drawAABB = true;
+        
         
     end
     
     methods
         
         % Constructor
-        function this=Car(t_hasAi,t_ai,t_pos_i,t_angle,t_mass,t_cof,t_frontalArea,t_axleDistance,t_speedLimit,t_color)
+        function this=Car(t_hasAi,t_ai,t_pos_i,t_angle,t_mass,t_cof,t_frontalArea,t_axleDistance,t_speedLimit,t_color,t_drawAABB)
             
             this.m_p = t_pos_i;
             this.m_v = [0,0];
@@ -122,6 +125,7 @@ classdef Car < handle
             this.m_axleDist = t_axleDistance;
             this.m_speedLimit = t_speedLimit;
             this.m_color = t_color;
+            this.m_drawAABB = t_drawAABB;
             
             % Couple the car with its artificial intelligence
             if t_hasAi
@@ -221,6 +225,12 @@ classdef Car < handle
             car_max_y = -inf;
             
             
+            box_min_x = inf;
+            box_max_x = -inf;
+            
+            box_min_y = inf;
+            box_max_y = -inf;
+            
             % Get the aabb for the car
             for i = 1:4
                 
@@ -246,7 +256,7 @@ classdef Car < handle
                 
             end % for i = 1:4
             
-            if this.s_drawAABB
+            if this.m_drawAABB
                 pgon_x = [car_min_x, car_max_x, car_max_x, car_min_x];
                 pgon_y = [car_min_y, car_min_y, car_max_y, car_max_y];
                 aabb = polyshape(pgon_x,pgon_y);
@@ -261,11 +271,7 @@ classdef Car < handle
                 box = t_boxes(i);
                 box = box.m_poly.Vertices;
                 
-                box_min_x = inf;
-                box_max_x = -inf;
-                
-                box_min_y = inf;
-                box_max_y = -inf;
+               
                 
                 % Find min and max for x and y box vertices
                 for j = 1:4
@@ -292,24 +298,10 @@ classdef Car < handle
                 % AABB collision detection
                 if car_max_x >= box_min_x && car_min_x <= box_max_x && car_max_y >= box_min_y && car_min_y <= box_max_y
                     r_isCollision = true;
-                    break;
+                    return;
                 end
                 
             end % for i = numel(t_boxes_bodies)
-            
-            
-            if ~r_isCollision
-                return
-            end
-            
-            % A collision just happened, now we must resolve it
-            
-            
-            car_center = centroid(this.m_model);
-           
-            
-            
-            
             
         end % checkCollision()
         
@@ -442,15 +434,13 @@ classdef Car < handle
             model_y = [this.m_p(2)+diagDist*sind(ang(1)),this.m_p(2)+0.5*axDist*wMult*sind(ang(2)),this.m_p(2)+0.5*axDist*wMult*sind(ang(3)),this.m_p(2)+ diagDist*sind(ang(4))];
             this.m_model = polyshape(model_x, model_y);
             
-            
-            
-            
-            
-            
             % Check for collisions
             isCol = checkCollision(this,t_boxes);
             if isCol 
-               fprintf("COL"); 
+                this.m_isStop = true;
+                this.m_v = [0,0];
+                this.m_a = [0,0];
+                setDrivingStyle(this.m_ai, "broken");
             end
             
             

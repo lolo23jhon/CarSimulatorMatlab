@@ -12,6 +12,7 @@ DRAW_CENTER_OF_ROTATION = false;
 DRAW_STEERING_DIRECTION = true;
 DRAW_ACCELERATION_DIRECTION = true;
 DRAW_VELOCITY_DIRECTION = true;
+DRAW_AABB = false;
 
 % Simulation properties ---------------------------------------------------
 dt = double(0.1);
@@ -59,9 +60,9 @@ camera = Camera(path.m_beginPos,CAM_AXIS_SIZE);
 
 
 % Car properties ----------------------------------------------------------
-NUM_CARS = 1;
+NUM_CARS = 5;
 AXLE_DISTANCE = 5;
-ALL_SAME_MASS = true;
+ALL_SAME_MASS = false;
 MASS = 700; % (kg)
 
 arr = ones(1,NUM_CARS);
@@ -74,9 +75,9 @@ for i = 2:NUM_CARS
 end
 
 
-ai = ["speeder","crasher","cautious","turtle","turtle","speeder"];
+ai = ["crasher","crasher","cautious","turtle","speer"];
 ang = 290.*arr; %(deg)
-mass = [200,660,660,660,700]; %(kg)
+mass = [660,660,660,660,1200]; %(kg)
 if ALL_SAME_MASS
     mass = MASS.*arr;
 end
@@ -88,7 +89,7 @@ color = ['r','g','b','y','k'];
 
 % Car initialization
 for i = 1:NUM_CARS
-    cars(i) = Car(true,CarAi(path,ai(i)),[pos_x(i),pos_y(i)],ang(i),mass(i),cof(i),frontalArea(i),axle(i),speedLimit,color(i));
+    cars(i) = Car(true,CarAi(path,ai(i)),[pos_x(i),pos_y(i)],ang(i),mass(i),cof(i),frontalArea(i),axle(i),speedLimit,color(i),DRAW_AABB);
 end
 
 
