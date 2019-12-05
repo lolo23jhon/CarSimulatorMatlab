@@ -25,7 +25,7 @@ classdef CarAi < handle
         
         s_styles = ["speeder","cautious","turtle"];
         
-        s_outOfTrackBrake = 3;
+        s_outOfTrackBrake = 3.5;
     end
     methods
         

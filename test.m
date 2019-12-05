@@ -1,11 +1,17 @@
+clc;
 clear;
-sizeMultiplier = 1;
-x = [6.942793367788718,6.930312676823302,7.724345026131775,7.736825717097165].*sizeMultiplier;
-y = [16.576319433156552,16.47710132819063,16.37721963450534,16.47643773947104].*sizeMultiplier;
+clf;
 
-pgon = polyshape(x,y);
+speed = 55.4214214;
+pos = [24,124];
 
-plot(pgon);
-
-axis equal;
-
+vars = [pos,speed];
+str = "Pos: (%.2f,%.2f), Speed: %.3f";
+hold on;
+ban = Banner(pos,str);
+pause(1);
+updateBanner(ban,[55,55],vars);
+pause(1);
+updateBanner(ban,[56,56],vars);
+pause(1);
+updateBanner(ban,[57,57],vars);

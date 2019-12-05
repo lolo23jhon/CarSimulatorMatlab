@@ -87,7 +87,7 @@ classdef Car < handle
         s_velColor = 'r';
         
         % Color of acceleration vector
-        s_accelColor = 'y';
+        s_accelColor = 'b';
         
         % Maximum steering angle (left and right)
         s_maxSteer = 60;
@@ -338,25 +338,33 @@ classdef Car < handle
         
         % Plot the car's model and some other artifacts depending on
         % boolean arguments
-        function drawCar(this,t_plotCom,t_steering,t_vel, t_accel)
+        function drawCar(this,t_plotCor,t_steering,t_vel, t_accel)
             plot(this.m_model,"FaceColor",this.m_color);
-            if t_plotCom
-                plot(this.m_p(1),this.m_p(2),'ob');
-            end
-            if t_steering
-                ang = this.m_facingAngle + this.m_steeringAngle;
-                line = angleToVector(ang,this.m_axleDist);
-                plot([this.m_p(1), this.m_p(1)+line(1) ],[this.m_p(2),this.m_p(2)+line(2)],this.s_steeringDirectionColor);
-            end
+            
+            % Draw the velocity vector
             if t_vel && this.m_v(1) ~= 0 && this.m_v(2) ~= 0
                 ang = get2dVectorAngle(this.m_v);
                 line = angleToVector(ang,this.m_axleDist);
-                plot([this.m_p(1), this.m_p(1)+line(1) ],[this.m_p(2),this.m_p(2)+line(2)],this.s_velColor);
+                plot([this.m_p(1), this.m_p(1)+line(1) ],[this.m_p(2),this.m_p(2)+line(2)],this.s_velColor,"LineWidth",2);
             end
+            
+            % Draw the acceleration vector
             if t_accel && this.m_a(1) ~= 0 && this.m_a(2) ~= 0
                 ang = get2dVectorAngle(this.m_a);
-                line = angleToVector(ang,this.m_axleDist);
-                plot([this.m_p(1), this.m_p(1)+line(1) ],[this.m_p(2),this.m_p(2)+line(2)],this.s_accelColor);
+                line = angleToVector(ang,this.m_axleDist*0.9);
+                plot([this.m_p(1), this.m_p(1)+line(1) ],[this.m_p(2),this.m_p(2)+line(2)],this.s_accelColor,"LineWidth",2);
+            end
+            
+            % Draw the wheel direction vector
+            if t_steering
+                ang = this.m_facingAngle + this.m_steeringAngle;
+                line = angleToVector(ang,this.m_axleDist*0.8);
+                plot([this.m_p(1), this.m_p(1)+line(1) ],[this.m_p(2),this.m_p(2)+line(2)],this.s_steeringDirectionColor,"LineWidth" , 2);
+            end
+            
+            % Draw the center of rotation
+            if t_plotCor
+                plot(this.m_p(1),this.m_p(2),'ob');
             end
             
         end
