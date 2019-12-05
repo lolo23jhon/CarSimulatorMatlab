@@ -75,9 +75,9 @@ for i = 2:NUM_CARS
 end
 
 
-ai = ["crasher","crasher","cautious","turtle","speer"];
+ai = ["crasher","cautious","cautious","turtle","speer"];
 ang = 290.*arr; %(deg)
-mass = [660,660,660,660,1200]; %(kg)
+mass = [660,700,660,665,1200]; %(kg)
 if ALL_SAME_MASS
     mass = MASS.*arr;
 end
