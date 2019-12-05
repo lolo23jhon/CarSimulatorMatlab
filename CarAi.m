@@ -26,6 +26,10 @@ classdef CarAi < handle
         s_styles = ["speeder","cautious","no-brakes","turtle","crasher"];
         
         s_outOfTrackBrake = 3.5;
+        
+        s_crashPoint = [812.12882679, 1839.4650411299942];
+        
+        s_distFromCrashPoint = 230;
     end
     methods
         
@@ -125,6 +129,17 @@ classdef CarAi < handle
             setThrottle(t_owner,1);
         end
         
+        % Driving style: purposedly crash onto the crash point
+        function crasher(this,t_owner)
+            distFromCrashPoint = dist2Pts(t_owner.m_p,this.s_crashPoint);
+            if distFromCrashPoint <= this.s_distFromCrashPoint
+                this.m_currCkpnt = this.s_crashPoint;
+                noBrakes(this,t_owner)
+            else
+                cautious(this,t_owner);
+            end
+        end
+        
         % Driving style: the slower the better
         function turtle(this,t_owner)
             
@@ -147,6 +162,23 @@ classdef CarAi < handle
             
         end
         
+        % Change the car ai on the run
+        function setDrivingStyle(this,t_style_str)
+            isIn = false;
+            for str = this.s_styles
+                if str == t_style_str
+                    isIn = true;
+                end
+            end
+            
+            if isIn
+                this.m_drivingStyle = t_style_str;
+            else
+               this.m_drivingStyle = "cautious";
+            end           
+            
+        end
+        
         % Controls the car
         function drive(this,t_owner)
             
@@ -154,6 +186,7 @@ classdef CarAi < handle
                 setThrottle(t_owner,0);
                 setBrake(t_owner,1);
                 setSteeringAngle(t_owner,0);
+                t_owner.m_isStop = true;
                 return;
             end
             
@@ -169,6 +202,8 @@ classdef CarAi < handle
                     noBrakes(this,t_owner);
                 case "turtle"
                     turtle(this,t_owner);
+                case "crasher"
+                    crasher(this,t_owner);
             end
             
             goTo(this,t_owner,this.m_currCkpnt);

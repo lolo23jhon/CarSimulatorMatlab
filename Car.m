@@ -69,6 +69,9 @@ classdef Car < handle
         % Energy given off as heat from friction with environment (J)
         m_lostEnergy;
         
+        % Stop driving?
+        m_isStop = false;
+        
     end
     properties (Constant)
         % Force output by the car's engine (N)
@@ -207,8 +210,8 @@ classdef Car < handle
         
         % This function receives a cell matrix with aabb vertices to decide
         % if a collision occured
-        function r_isCollision = checkCollision(this, t_aabb)
-            
+        function r_isCollision = checkCollision(this, t_boxes)
+            r_isCollision = false;
             car_verts = this.m_model.Vertices;
             
             car_min_x = inf;
@@ -250,11 +253,13 @@ classdef Car < handle
                 plot(aabb,"FaceColor",'w');
             end
             
-            
+             
             % Interpenetration comparison
-            for i = numel(t_aabb)
-                
-                box = t_aabb{i};
+         
+            for i = numel(t_boxes)
+                box_id = i;
+                box = t_boxes(i);
+                box = box.m_poly.Vertices;
                 
                 box_min_x = inf;
                 box_max_x = -inf;
@@ -282,26 +287,35 @@ classdef Car < handle
                         box_max_y = box_y;
                     end
                     
-                end % for j = 1:4
-                
-                
-                
+                end % for j = 1:
                 
                 % AABB collision detection
                 if car_max_x >= box_min_x && car_min_x <= box_max_x && car_max_y >= box_min_y && car_min_y <= box_max_y
                     r_isCollision = true;
-                    return;
+                    break;
                 end
                 
-            end % for i = numel(t_aabb_bodies)
+            end % for i = numel(t_boxes_bodies)
             
-            r_isCollision = false;
+            
+            if ~r_isCollision
+                return
+            end
+            
+            % A collision just happened, now we must resolve it
+            
+            
+            car_center = centroid(this.m_model);
+           
+            
+            
+            
             
         end % checkCollision()
         
         
         % Update all the properties of the car, runs each tick
-        function updateCar(this,t_dt,t_aabb)
+        function updateCar(this,t_dt,t_boxes)
             % Get the linear speed used in force calculations
             velMag = vectorMagnitude(this.m_v);
             
@@ -309,7 +323,7 @@ classdef Car < handle
             this.m_kineticEnergy = 0.5*this.m_mass*velMag^2;
             
             % If static and with brake on, there's no movement
-            if velMag < this.m_brake
+            if velMag < this.m_brake && this.m_isStop
                 this.m_v = [0,0];
                 this.m_a = [0,0];
                 return;
@@ -434,7 +448,7 @@ classdef Car < handle
             
             
             % Check for collisions
-            isCol = checkCollision(this,t_aabb);
+            isCol = checkCollision(this,t_boxes);
             if isCol 
                fprintf("COL"); 
             end

@@ -74,9 +74,9 @@ for i = 2:NUM_CARS
 end
 
 
-ai = ["cautious","cautious","turtle","turtle","speeder"];
+ai = ["speeder","crasher","cautious","turtle","turtle","speeder"];
 ang = 290.*arr; %(deg)
-mass = [660,660,660,660,700]; %(kg)
+mass = [200,660,660,660,700]; %(kg)
 if ALL_SAME_MASS
     mass = MASS.*arr;
 end
@@ -128,7 +128,7 @@ for i = 1:NUM_TICKS
     for n = 1:NUM_CARS
         
         % Update each car instance
-        updateCar(cars(n),dt,AABB);
+        updateCar(cars(n),dt,stands);
         
         % Change car inputs
         drive(cars(n).m_ai,cars(n));
