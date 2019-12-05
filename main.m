@@ -74,7 +74,7 @@ for i = 2:NUM_CARS
 end
 
 
-ai = ["no-brakes","cautious","turtle","turtle","speeder"];
+ai = ["cautious","cautious","turtle","turtle","speeder"];
 ang = 290.*arr; %(deg)
 mass = [660,660,660,660,700]; %(kg)
 if ALL_SAME_MASS

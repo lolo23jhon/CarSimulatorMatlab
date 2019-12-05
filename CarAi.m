@@ -23,7 +23,7 @@ classdef CarAi < handle
         
         s_wpCol = [0.2,0.8,0.8];
         
-        s_styles = ["speeder","cautious","no-brakes","turtle"];
+        s_styles = ["speeder","cautious","no-brakes","turtle","crasher"];
         
         s_outOfTrackBrake = 3.5;
     end
@@ -158,7 +158,7 @@ classdef CarAi < handle
             end
             
             this.m_currCkpnt = [t_owner.m_p(1)+this.m_ckpntDist,this.m_path.m_y(t_owner.m_p(1)+this.m_ckpntDist)];
-            goTo(this,t_owner,this.m_currCkpnt);
+            
             
             switch (this.m_drivingStyle)
                 case "speeder"
@@ -170,6 +170,8 @@ classdef CarAi < handle
                 case "turtle"
                     turtle(this,t_owner);
             end
+            
+            goTo(this,t_owner,this.m_currCkpnt);
             
             
             distFromFinish = dist2Pts(t_owner.m_p,this.m_path.m_endPos);

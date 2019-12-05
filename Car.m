@@ -207,7 +207,7 @@ classdef Car < handle
         
         % This function receives a cell matrix with aabb vertices to decide
         % if a collision occured
-        function r_isCollision = checkCollision(this, t_aabb_bodies)
+        function r_isCollision = checkCollision(this, t_aabb)
             
             car_verts = this.m_model.Vertices;
             
@@ -246,15 +246,15 @@ classdef Car < handle
             if this.s_drawAABB
                 pgon_x = [car_min_x, car_max_x, car_max_x, car_min_x];
                 pgon_y = [car_min_y, car_min_y, car_max_y, car_max_y];
-                aabb = polygon(pgon_x,pgon_y);
-                plot(aabb,'g');
+                aabb = polyshape(pgon_x,pgon_y);
+                plot(aabb,"FaceColor",'w');
             end
             
             
             % Interpenetration comparison
-            for i = numel(t_aabb_bodies)
+            for i = numel(t_aabb)
                 
-                box = t_aabb_body{i};
+                box = t_aabb{i};
                 
                 box_min_x = inf;
                 box_max_x = -inf;
@@ -435,6 +435,9 @@ classdef Car < handle
             
             % Check for collisions
             isCol = checkCollision(this,t_aabb);
+            if isCol 
+               fprintf("COL"); 
+            end
             
             
         end %  updateCar(this,t_dt)
