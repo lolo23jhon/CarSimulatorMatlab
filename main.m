@@ -39,10 +39,19 @@ path = Path(xo,xf,BORDER_LINES_DRAWING_DELTA_STEP,equation,TRACK_WIDTH,SIZE_MULT
 
 
 % Stands' properties ------------------------------------------------------
+% (Reference position for offset is 20.5 m from road CENTER line)
+CUSTOM__Y_OFFSET = false;
+Y_OFFSET = -5;
+if ~CUSTOM__Y_OFFSET
+   Y_OFFSET = (20.5 + TRACK_WIDTH/TRACK_WIDTH/2) / SIZE_MULTIPLIER; % 20 + 5% meters safe distance
+else
+    Y_OFFSET = Y_OFFSET/SIZE_MULTIPLIER;
+end
+
 st_a_x = [22.160389436299898,22.9603894363001,22.9603894363001,22.160389436299898];
-st_a_y = [30.13829615269992,30.13829615269992,30.238296152700443,30.238296152699306];
+st_a_y = [30.13829615269992,30.13829615269992,30.238296152700443,30.238296152699306] + Y_OFFSET;
 st_b_x = [7.721288267899989,8.521288267900013,8.521288267900013,7.721288267899989];
-st_b_y = [18.294650411299987,18.294650411299703,18.394650411299942,18.394650411299942];
+st_b_y = [18.294650411299987,18.294650411299703,18.394650411299942,18.394650411299942] - Y_OFFSET;
 stands = [Box(st_a_x,st_a_y,SIZE_MULTIPLIER,'k'),Box(st_b_x,st_b_y,SIZE_MULTIPLIER,'k')];
 
 
@@ -89,7 +98,7 @@ color = ['r','g','b','y','k'];
 
 % Car initialization
 for i = 1:NUM_CARS
-    cars(i) = Car(true,CarAi(path,ai(i)),[pos_x(i),pos_y(i)],ang(i),mass(i),cof(i),frontalArea(i),axle(i),speedLimit,color(i),DRAW_AABB);
+    cars(i) = Car(true,CarAi(path,ai(i),Y_OFFSET*SIZE_MULTIPLIER),[pos_x(i),pos_y(i)],ang(i),mass(i),cof(i),frontalArea(i),axle(i),speedLimit,color(i),DRAW_AABB);
 end
 
 

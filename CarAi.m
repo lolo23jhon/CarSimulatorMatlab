@@ -16,6 +16,7 @@ classdef CarAi < handle
         % Possible values: "speeder", "cautious"
         m_drivingStyle;
         
+        m_crashPoint = [812.12882679, 1839.4650411299942];
         
     end % properties
     properties (Constant)
@@ -27,16 +28,14 @@ classdef CarAi < handle
         
         s_outOfTrackBrake = 3.5;
         
-        s_crashPoint = [812.12882679, 1839.4650411299942];
-        
         s_distFromCrashPoint = 180;
     end
     methods
         
         % Constructor
-        function this = CarAi(t_path,t_style)
+        function this = CarAi(t_path,t_style,t_stands_dist_from_center)
             this.m_path = t_path;
-            
+            this.m_crashPoint = this.m_crashPoint - t_stands_dist_from_center;
             isIn = false;
             for i = this.s_styles
                 if  t_style == i
@@ -131,9 +130,9 @@ classdef CarAi < handle
         
         % Driving style: purposedly crash onto the crash point
         function crasher(this,t_owner)
-            distFromCrashPoint = dist2Pts(t_owner.m_p,this.s_crashPoint);
+            distFromCrashPoint = dist2Pts(t_owner.m_p,this.m_crashPoint);
             if distFromCrashPoint <= this.s_distFromCrashPoint
-                this.m_currCkpnt = this.s_crashPoint;
+                this.m_currCkpnt = this.m_crashPoint;
                 noBrakes(this,t_owner)
             else
                 cautious(this,t_owner);
